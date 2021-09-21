@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import ContactForm from 'components/ContactForm/ContactForm';
 import ContactList from 'components/ContactList/ContactList';
 import Filter from 'components/Filter/Filter';
@@ -9,8 +10,10 @@ export default function App() {
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    if (JSON.parse(localStorage.getItem('contacts'))) {
-      setContacts(JSON.parse(localStorage.getItem('contacts')));
+    const contacts = localStorage.getItem('contacts');
+    const parseContacts = JSON.parse(contacts);
+    if (parseContacts) {
+      setContacts(parseContacts);
     }
   }, []);
 
@@ -18,14 +21,23 @@ export default function App() {
     localStorage.setItem('contacts', JSON.stringify(contacts));
   }, [contacts]);
 
-  const formSubmit = dataForm => {
-    if (
-      contacts.find(el => el.name.toLowerCase() === dataForm.name.toLowerCase())
-    ) {
-      alert(`${dataForm.name} is already in contacts.`);
-    } else {
-      return setContacts(prevContacts => [...prevContacts, dataForm]);
-    }
+  const formSubmit = data => {
+    setContacts(prevContacts => {
+      const newContact = {
+        id: `${uuidv4()}`,
+        name: data.name,
+        number: data.number,
+      };
+      const duplicateContact = prevContacts.find(contact => {
+        return contact.name === data.name;
+      });
+      if (duplicateContact) {
+        alert(`${data.name} вже є у телефонній книзі!!!`);
+        return [...prevContacts];
+      } else {
+        return setContacts(prevContacts => [...prevContacts, newContact]);
+      }
+    });
   };
 
   const deleteContact = contactId => {
@@ -46,7 +58,7 @@ export default function App() {
   return (
     <Conteiner>
       <h1>Phonebook</h1>
-      <ContactForm onSubmitData={formSubmit} />
+      <ContactForm onSubmit={formSubmit} />
       <h1>Contacts</h1>
       <Filter setFilterToState={setFilterToState} />
       <ContactList
