@@ -26,6 +26,7 @@ export const Label = styled.label`
   display: flex;
   flex-direction: column;
   max-width: 200px;
+  height: 40px;
 `;
 export const Input = styled.input`
   border-radius: 2px;
