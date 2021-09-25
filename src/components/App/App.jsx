@@ -8,31 +8,30 @@ import { Conteiner } from './App.styled';
 export default function App() {
   const [contacts, setContacts] = useState([]);
   const [filter, setFilter] = useState('');
+  const localstorageKeyName = 'contacts';
 
   useEffect(() => {
-    const contacts = localStorage.getItem('contacts');
+    const contacts = localStorage.getItem(localstorageKeyName);
     const parseContacts = JSON.parse(contacts);
-    if (parseContacts) {
-      setContacts(parseContacts);
-    }
+    parseContacts && setContacts(parseContacts);
   }, []);
 
   useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
+    localStorage.setItem(localstorageKeyName, JSON.stringify(contacts));
   }, [contacts]);
 
-  const formSubmit = data => {
+  const formSubmit = ({ name, number }) => {
     setContacts(prevContacts => {
       const newContact = {
         id: `${uuidv4()}`,
-        name: data.name,
-        number: data.number,
+        name,
+        number,
       };
       const duplicateContact = prevContacts.find(contact => {
-        return contact.name === data.name;
+        return contact.name === name;
       });
       if (duplicateContact) {
-        alert(`${data.name} вже є у телефонній книзі!!!`);
+        alert(`${name} вже є у телефонній книзі!!!`);
         return [...prevContacts];
       } else {
         return setContacts(prevContacts => [...prevContacts, newContact]);
@@ -45,15 +44,15 @@ export default function App() {
   };
 
   const setFilterToState = filterData => {
-    setContacts([...contacts]);
     setFilter(`${filterData}`);
   };
 
-  const filterContact = contacts => {
+  const filterContact = () => {
     return contacts.filter(contact =>
       contact.name.toLowerCase().includes(filter.toLowerCase()),
     );
   };
+  const filterContacts = filterContact();
 
   return (
     <Conteiner>
@@ -61,10 +60,7 @@ export default function App() {
       <ContactForm onSubmit={formSubmit} />
       <h1>Contacts</h1>
       <Filter setFilterToState={setFilterToState} />
-      <ContactList
-        contacts={filterContact(contacts)}
-        onDelete={deleteContact}
-      />
+      <ContactList contacts={filterContacts} onDelete={deleteContact} />
     </Conteiner>
   );
 }

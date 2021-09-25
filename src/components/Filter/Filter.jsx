@@ -8,7 +8,7 @@ export default function Filter(props) {
   return (
     <Conteiner>
       <Title>Find contacts by name</Title>
-      <Input onChange={setFilterValue}></Input>
+      <Input onChange={setFilterValue} />
     </Conteiner>
   );
 }
